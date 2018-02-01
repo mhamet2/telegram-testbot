@@ -84,7 +84,7 @@ def button(bot, update):
 
 	bot.edit_message_text(text=emojize(response, use_aliases=True),
         	                chat_id=query.message.chat_id,
-				message_id=query.message.message_id)
+	                        message_id=query.message.message_id)
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
