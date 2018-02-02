@@ -71,7 +71,7 @@ def button(bot, update):
     statsdb = config.get('bot', 'statsfile')
     statsconn = create_connection(statsdb)
     statscur = statsconn.cursor()
-    statscur.execute("SELECT id,id_user,ok,failed FROM stats where id_user=? LIMIT 1", (user_id,))
+    statscur.execute("SELECT id,id_user,ok,failed FROM stats WHERE id_user=? LIMIT 1", (user_id,))
 
     users = statscur.fetchall()
 
@@ -81,7 +81,7 @@ def button(bot, update):
       statscur.execute("INSERT INTO stats(id_user,ok,failed) VALUES (?,0,0)",(user_id,))
       statsconn.commit()
       statscur = statsconn.cursor()
-      statscur.execute("SELECT id,id_user,ok,failed FROM stats where id_user=? LIMIT 1", (user_id,))
+      statscur.execute("SELECT id,id_user,ok,failed FROM stats WHERE id_user=? LIMIT 1", (user_id,))
       users = statscur.fetchall()
 
     database = config.get('bot', 'dbfile')
@@ -95,7 +95,7 @@ def button(bot, update):
 
     for row in rows:
         response=row[1]+"\n\n"
-	
+
 	encertada=True
 	for i in range(2,6):
 		if len(row[i]) > 0:
@@ -108,7 +108,7 @@ def button(bot, update):
 					encertada=False
 				else:
 					response+=lletra+") "+row[i]+"\n"
-    	
+
 	statscur = statsconn.cursor()
 	if encertada:
 		statscur.execute("UPDATE stats SET ok = ok + 1 WHERE id_user=?",(user_id,))
