@@ -19,14 +19,32 @@ def create_connection(db_file):
 
     return None
 
+def showpenis(bot, update):
+    if os.path.isfile('./img/29.jpg'):
+	bot.send_photo(chat_id=update.message.chat_id, photo=open('./img/29.jpg', 'rb'))
+
+def stats(bot, update):
+    chat_id = update.message.chat_id
+    user_id = update.message.from_user.id
+
+    statsdb = config.get('bot', 'statsfile')
+    statsconn = create_connection(statsdb)
+    statscur = statsconn.cursor()
+    statscur.execute("SELECT id,id_user,ok,failed FROM stats WHERE id_user=? LIMIT 1", (user_id,))
+
+    users = statscur.fetchall()
+
+    for user in users:
+	update.message.reply_text(emojize(" :white_check_mark: "+str(user[2])+"\n :x: "+str(user[3]), use_aliases=True))
+
 def start(bot, update):
-    update.message.reply_text(emojize("fer servir la comanda /pregunta"))
+    update.message.reply_text(emojize("fer servir la comanda /pregunta", use_aliases=True))
 
 def pregunta(bot, update):
     database = config.get('bot', 'dbfile')
     conn = create_connection(database)
     cur = conn.cursor()
-    cur.execute("SELECT * FROM  preguntes ORDER BY RANDOM() LIMIT 1")
+    cur.execute("SELECT id,pregunta,resposta_a,resposta_b,resposta_c,resposta_d,resposta_correcte FROM  preguntes ORDER BY RANDOM() LIMIT 1")
 
     rows = cur.fetchall()
 
@@ -48,30 +66,37 @@ def pregunta(bot, update):
 
 def button(bot, update):
     query = update.callback_query
+    user_id = query.from_user.id
 
-    #statsdb = config.get('bot', 'statsfile')
-    #statsconn = create_connection(statsdb)
-    #statscur = statsconn.cursor()
-    #statscur.execute("SELECT * FROM stats where id_user=? LIMIT 1", (query.from.id,))
+    statsdb = config.get('bot', 'statsfile')
+    statsconn = create_connection(statsdb)
+    statscur = statsconn.cursor()
+    statscur.execute("SELECT id,id_user,ok,failed FROM stats where id_user=? LIMIT 1", (user_id,))
 
-    #users = statscur.fetchall()
+    users = statscur.fetchall()
 
     # si no existeix, crear a 0
-    #if len(users) == 0:
-    #  statscur.execute("INSERT INTO stats VALUES ...")
+    if len(users) == 0:
+      statscur = statsconn.cursor()
+      statscur.execute("INSERT INTO stats(id_user,ok,failed) VALUES (?,0,0)",(user_id,))
+      statsconn.commit()
+      statscur = statsconn.cursor()
+      statscur.execute("SELECT id,id_user,ok,failed FROM stats where id_user=? LIMIT 1", (user_id,))
+      users = statscur.fetchall()
 
     database = config.get('bot', 'dbfile')
     conn = create_connection(database)
     cur = conn.cursor()
-    cur.execute("SELECT * FROM preguntes WHERE pregunta=? LIMIT 1", (query.message.text,))
+    cur.execute("SELECT id,pregunta,resposta_a,resposta_b,resposta_c,resposta_d,resposta_correcte FROM preguntes WHERE pregunta=? LIMIT 1", (query.message.text,))
 
     rows = cur.fetchall()
 
-    print query
+    #print query
 
     for row in rows:
         response=row[1]+"\n\n"
-
+	
+	encertada=True
 	for i in range(2,6):
 		if len(row[i]) > 0:
 			lletra=chr(ord('a') + i-2)
@@ -80,8 +105,16 @@ def button(bot, update):
 			else:
 				if lletra == query.data:
 					response+=lletra+") "+row[i]+" :x:\n"
+					encertada=False
 				else:
 					response+=lletra+") "+row[i]+"\n"
+    	
+	statscur = statsconn.cursor()
+	if encertada:
+		statscur.execute("UPDATE stats SET ok = ok + 1 WHERE id_user=?",(user_id,))
+	else:
+		statscur.execute("UPDATE stats SET failed = failed + 1 WHERE id_user=?",(user_id,))
+	statsconn.commit()
 
 	bot.edit_message_text(text=emojize(response, use_aliases=True),
         	                chat_id=query.message.chat_id,
@@ -101,6 +134,8 @@ dp = updater.dispatcher
 
 updater.dispatcher.add_handler(CommandHandler('start', start))
 updater.dispatcher.add_handler(CommandHandler('pregunta', pregunta))
+updater.dispatcher.add_handler(CommandHandler('stats', stats))
+updater.dispatcher.add_handler(CommandHandler('kill', showpenis))
 updater.dispatcher.add_handler(CallbackQueryHandler(button))
 
 updater.start_polling()
