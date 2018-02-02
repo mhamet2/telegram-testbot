@@ -32,9 +32,10 @@ def pregunta(bot, update):
 
 
     for row in rows:
-            if os.path.isfile('./img/'+str(row[0])+'.jpg'):
-                #bot.send_photo(chat_id=chat_id, photo=open('tests/test.png', 'rb'))
-                bot.send_photo(chat_id=update.message.chat_id, photo=open('./img/'+str(row[0])+'.jpg', 'rb'))
+            for ext in [ 'jpg', 'png' ]
+                if os.path.isfile('./img/'+str(row[0])+'.'+ext):
+                    #bot.send_photo(chat_id=chat_id, photo=open('tests/test.png', 'rb'))
+                    bot.send_photo(chat_id=update.message.chat_id, photo=open('./img/'+str(row[0])+'.'+ext, 'rb'))
 
             keyboard = [[InlineKeyboardButton(row[2], callback_data='a')],
                         [InlineKeyboardButton(row[3], callback_data='b')],
