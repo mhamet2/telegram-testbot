@@ -42,7 +42,7 @@ def ranking(bot, update):
         for user in users:
             if user[4] is not None:
                 ranking.append(''+user[4]+" :white_check_mark: "+str(user[2])+" :x: "+str(user[3])+"\n")
-        update.message.reply_text(emojize(''.join(raking), use_aliases=True))
+        update.message.reply_text(emojize(''.join(ranking), use_aliases=True))
 
 def stats(bot, update):
     chat_id = update.message.chat_id
