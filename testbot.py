@@ -35,7 +35,7 @@ def stats(bot, update):
     users = statscur.fetchall()
 
     for user in users:
-	update.message.reply_text(emojize(" :white_check_mark: "+str(user[2])+"\n :x: "+str(user[3]), use_aliases=True))
+        update.message.reply_text(emojize(" :white_check_mark: "+str(user[2])+"\n :x: "+str(user[3]), use_aliases=True))
 
 def resetstats(bot, update):
     user_id = update.message.from_user.id
