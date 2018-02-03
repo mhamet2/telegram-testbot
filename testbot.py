@@ -37,8 +37,10 @@ def ranking(bot, update):
     if len(users)<=0:
         update.message.reply_text(emojize("No hi ha dades"), use_aliases=True)
     else:
+        message=""
         for user in users:
-            update.message.reply_text(emojize(user[4]+" :white_check_mark: "+str(user[2])+" :x: "+str(user[3]), use_aliases=True))
+            message+=user[4]+" :white_check_mark: "+str(user[2])+" :x: "+str(user[3])
+        update.message.reply_text(emojize(message, use_aliases=True))
 
 def stats(bot, update):
     chat_id = update.message.chat_id
