@@ -35,7 +35,7 @@ def stats(bot, update):
     users = statscur.fetchall()
 
     if len(users)<=0:
-        update.message.reply_text(emojize("No hi ha dades"), use_aliases=True))
+        update.message.reply_text(emojize("No hi ha dades"), use_aliases=True)
     else:
         for user in users:
             update.message.reply_text(emojize(" :white_check_mark: "+str(user[2])+"\n :x: "+str(user[3]), use_aliases=True))
