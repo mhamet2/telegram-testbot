@@ -30,7 +30,7 @@ def ranking(bot, update):
     statsdb = config.get('bot', 'statsfile')
     statsconn = create_connection(statsdb)
     statscur = statsconn.cursor()
-    statscur.execute("SELECT id,id_user,ok,failed,display_name FROM stats ORDER BY ok DESC LIMIT 10", (user_id,))
+    statscur.execute("SELECT id,id_user,ok,failed,display_name FROM stats ORDER BY ok DESC LIMIT 10")
 
     users = statscur.fetchall()
 
