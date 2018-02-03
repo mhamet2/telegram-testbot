@@ -132,6 +132,7 @@ def button(bot, update):
 		statscur.execute("UPDATE stats SET ok = ok + 1 WHERE id_user=?",(user_id,))
 	else:
 		statscur.execute("UPDATE stats SET failed = failed + 1 WHERE id_user=?",(user_id,))
+    statscur.execute("UPDATE display_name SET display_name = ? WHERE id_user=?",(display_name, user_id,))
 	statsconn.commit()
 
 	bot.edit_message_text(text=emojize(response, use_aliases=True),
