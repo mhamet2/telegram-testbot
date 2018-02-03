@@ -37,6 +37,14 @@ def stats(bot, update):
     for user in users:
 	update.message.reply_text(emojize(" :white_check_mark: "+str(user[2])+"\n :x: "+str(user[3]), use_aliases=True))
 
+def reset(bot, update):
+    statsdb = config.get('bot', 'statsfile')
+    statsconn = create_connection(statsdb)
+    statscur = statsconn.cursor()
+    statscur.execute("DELETE FROM stats WHERE id_user=?", (user_id,))
+
+    statsconn.commit()
+
 def start(bot, update):
     update.message.reply_text(emojize("fer servir la comanda /pregunta", use_aliases=True))
 
@@ -67,6 +75,9 @@ def pregunta(bot, update):
 def button(bot, update):
     query = update.callback_query
     user_id = query.from_user.id
+    display_name = query.from_user.first_name
+
+    print query
 
     statsdb = config.get('bot', 'statsfile')
     statsconn = create_connection(statsdb)
@@ -78,7 +89,7 @@ def button(bot, update):
     # si no existeix, crear a 0
     if len(users) == 0:
       statscur = statsconn.cursor()
-      statscur.execute("INSERT INTO stats(id_user,ok,failed) VALUES (?,0,0)",(user_id,))
+      statscur.execute("INSERT INTO stats(id_user,ok,failed,display_name) VALUES (?,0,0,?)",(user_id,display_name,))
       statsconn.commit()
       statscur = statsconn.cursor()
       statscur.execute("SELECT id,id_user,ok,failed FROM stats WHERE id_user=? LIMIT 1", (user_id,))
@@ -120,8 +131,8 @@ def button(bot, update):
         	                chat_id=query.message.chat_id,
 	                        message_id=query.message.message_id)
 
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# logging.basicConfig(level=logging.DEBUG,
+#                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 config = SafeConfigParser()
 config.read('testbot.config')
