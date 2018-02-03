@@ -39,7 +39,8 @@ def ranking(bot, update):
     else:
         message="ranking:\n\n"
         for user in users:
-            message=message+user[4]+" :white_check_mark: "+str(user[2])+" :x: "+str(user[3])+"\n"
+            update.message.reply_text(emojize(" :white_check_mark: "+str(user[2])+"\n :x: "+str(user[3]), use_aliases=True))
+            # message=message+user[4]+" :white_check_mark: "+str(user[2])+" :x: "+str(user[3])+"\n"
         update.message.reply_text(emojize(message, use_aliases=True))
 
 def stats(bot, update):
