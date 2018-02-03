@@ -108,7 +108,7 @@ def button(bot, update):
     statsdb = config.get('bot', 'statsfile')
     statsconn = create_connection(statsdb)
     statscur = statsconn.cursor()
-    statscur.execute("SELECT id,id_user,ok,failed FROM stats WHERE id_user=? LIMIT 1", (user_id,))
+    statscur.execute("SELECT id,id_user,ok,failed,display_name FROM stats WHERE id_user=? LIMIT 1", (user_id,))
 
     users = statscur.fetchall()
 
@@ -118,13 +118,16 @@ def button(bot, update):
       statscur.execute("INSERT INTO stats(id_user,ok,failed,display_name) VALUES (?,0,0,?)",(user_id,display_name,))
       statsconn.commit()
       statscur = statsconn.cursor()
-      statscur.execute("SELECT id,id_user,ok,failed FROM stats WHERE id_user=? LIMIT 1", (user_id,))
+      statscur.execute("SELECT id,id_user,ok,failed,display_name FROM stats WHERE id_user=? LIMIT 1", (user_id,))
       users = statscur.fetchall()
+
+    for user in users:
+        stats_display_name = user[4]
 
     database = config.get('bot', 'dbfile')
     conn = create_connection(database)
     cur = conn.cursor()
-    cur.execute("SELECT id,pregunta,resposta_a,resposta_b,resposta_c,resposta_d,resposta_correcte,display_name FROM preguntes WHERE pregunta=? LIMIT 1", (query.message.text,))
+    cur.execute("SELECT id,pregunta,resposta_a,resposta_b,resposta_c,resposta_d,resposta_correcte FROM preguntes WHERE pregunta=? LIMIT 1", (query.message.text,))
 
     rows = cur.fetchall()
 
@@ -152,7 +155,7 @@ def button(bot, update):
     	else:
     		statscur.execute("UPDATE stats SET failed = failed + 1 WHERE id_user=?",(user_id,))
 
-        if row[8]!=display_name:
+        if stats_display_name!=display_name:
     	       statscur.execute("UPDATE stats SET display_name = ? WHERE id_user=?",(display_name, user_id,))
     	statsconn.commit()
 
