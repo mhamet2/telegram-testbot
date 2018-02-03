@@ -77,7 +77,7 @@ def button(bot, update):
     user_id = query.from_user.id
     display_name = query.from_user.first_name
 
-    print query
+    # print query
 
     statsdb = config.get('bot', 'statsfile')
     statsconn = create_connection(statsdb)
@@ -131,8 +131,8 @@ def button(bot, update):
         	                chat_id=query.message.chat_id,
 	                        message_id=query.message.message_id)
 
-# logging.basicConfig(level=logging.DEBUG,
-#                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 config = SafeConfigParser()
 config.read('testbot.config')
