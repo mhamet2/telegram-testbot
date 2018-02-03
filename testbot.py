@@ -39,13 +39,15 @@ def stats(bot, update):
 
 def resetstats(bot, update):
     user_id = update.message.from_user.id
-    
+
     statsdb = config.get('bot', 'statsfile')
     statsconn = create_connection(statsdb)
     statscur = statsconn.cursor()
     statscur.execute("DELETE FROM stats WHERE id_user=?", (user_id,))
 
     statsconn.commit()
+
+    update.message.reply_text(emojize("estadistiques resetejades", use_aliases=True))
 
 def start(bot, update):
     update.message.reply_text(emojize("fer servir la comanda /pregunta", use_aliases=True))
