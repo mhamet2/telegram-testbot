@@ -41,7 +41,7 @@ def ranking(bot, update):
         ranking.append("ranking:\n\n")
         for user in users:
             update.message.reply_text(emojize(" :white_check_mark: "+str(user[2])+"\n :x: "+str(user[3]), use_aliases=True))
-            raking.append(''+user[4]+" :white_check_mark: "+str(user[2])+" :x: "+str(user[3])+"\n")
+            raking.append(''+str(user[4])+" :white_check_mark: "+str(user[2])+" :x: "+str(user[3])+"\n")
         update.message.reply_text(emojize(''.join(raking), use_aliases=True))
 
 def stats(bot, update):
