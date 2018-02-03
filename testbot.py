@@ -105,7 +105,7 @@ def button(bot, update):
     database = config.get('bot', 'dbfile')
     conn = create_connection(database)
     cur = conn.cursor()
-    cur.execute("SELECT id,pregunta,resposta_a,resposta_b,resposta_c,resposta_d,resposta_correcte FROM preguntes WHERE pregunta=? LIMIT 1", (query.message.text,))
+    cur.execute("SELECT id,pregunta,resposta_a,resposta_b,resposta_c,resposta_d,resposta_correcte,display_name FROM preguntes WHERE pregunta=? LIMIT 1", (query.message.text,))
 
     rows = cur.fetchall()
 
