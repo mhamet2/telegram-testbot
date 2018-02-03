@@ -183,6 +183,7 @@ updater.dispatcher.add_handler(CommandHandler('stats', stats))
 updater.dispatcher.add_handler(CommandHandler('resetstats', resetstats))
 updater.dispatcher.add_handler(CommandHandler('ranking', ranking))
 updater.dispatcher.add_handler(CommandHandler('kill', showpenis))
+updater.dispatcher.add_handler(CommandHandler('pegunta', showpenis))
 updater.dispatcher.add_handler(CallbackQueryHandler(button))
 
 updater.start_polling()
