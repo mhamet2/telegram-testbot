@@ -38,6 +38,8 @@ def stats(bot, update):
 	update.message.reply_text(emojize(" :white_check_mark: "+str(user[2])+"\n :x: "+str(user[3]), use_aliases=True))
 
 def resetstats(bot, update):
+    user_id = update.message.from_user.id
+    
     statsdb = config.get('bot', 'statsfile')
     statsconn = create_connection(statsdb)
     statscur = statsconn.cursor()
