@@ -37,7 +37,7 @@ def stats(bot, update):
     for user in users:
 	update.message.reply_text(emojize(" :white_check_mark: "+str(user[2])+"\n :x: "+str(user[3]), use_aliases=True))
 
-def reset(bot, update):
+def resetstats(bot, update):
     statsdb = config.get('bot', 'statsfile')
     statsconn = create_connection(statsdb)
     statscur = statsconn.cursor()
@@ -146,6 +146,7 @@ dp = updater.dispatcher
 updater.dispatcher.add_handler(CommandHandler('start', start))
 updater.dispatcher.add_handler(CommandHandler('pregunta', pregunta))
 updater.dispatcher.add_handler(CommandHandler('stats', stats))
+updater.dispatcher.add_handler(CommandHandler('resetstats', resetstats))
 updater.dispatcher.add_handler(CommandHandler('kill', showpenis))
 updater.dispatcher.add_handler(CallbackQueryHandler(button))
 
