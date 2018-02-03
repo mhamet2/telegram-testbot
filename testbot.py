@@ -23,6 +23,23 @@ def showpenis(bot, update):
     if os.path.isfile('./img/29.jpg'):
 	bot.send_photo(chat_id=update.message.chat_id, photo=open('./img/29.jpg', 'rb'))
 
+def ranking(bot, update):
+    chat_id = update.message.chat_id
+    user_id = update.message.from_user.id
+
+    statsdb = config.get('bot', 'statsfile')
+    statsconn = create_connection(statsdb)
+    statscur = statsconn.cursor()
+    statscur.execute("SELECT id,id_user,ok,failed,display_name FROM stats ORDER BY ok DESC LIMIT 10", (user_id,))
+
+    users = statscur.fetchall()
+
+    if len(users)<=0:
+        update.message.reply_text(emojize("No hi ha dades"), use_aliases=True)
+    else:
+        for user in users:
+            update.message.reply_text(emojize(user[4]+" :white_check_mark: "+str(user[2])+" :x: "+str(user[3]), use_aliases=True))
+
 def stats(bot, update):
     chat_id = update.message.chat_id
     user_id = update.message.from_user.id
@@ -157,6 +174,7 @@ updater.dispatcher.add_handler(CommandHandler('start', start))
 updater.dispatcher.add_handler(CommandHandler('pregunta', pregunta))
 updater.dispatcher.add_handler(CommandHandler('stats', stats))
 updater.dispatcher.add_handler(CommandHandler('resetstats', resetstats))
+updater.dispatcher.add_handler(CommandHandler('ranking', ranking))
 updater.dispatcher.add_handler(CommandHandler('kill', showpenis))
 updater.dispatcher.add_handler(CallbackQueryHandler(button))
 
