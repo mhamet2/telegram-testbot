@@ -190,6 +190,7 @@ def button(bot, update):
 
     for row in rows:
         response=row[1]+"\n\n"
+        id_pregunta=row[0]
     	encertada=True
     	for i in range(2,6):
     		if len(row[i]) > 0:
@@ -213,6 +214,22 @@ def button(bot, update):
         if stats_display_name!=display_name:
     	       statscur.execute("UPDATE stats SET display_name = ? WHERE id_user=?",(display_name, user_id,))
     	statsconn.commit()
+
+        statscur = statsconn.cursor()
+        statscur.execute("SELECT id_pregunta,ok,failed FROM stats_preguntes WHERE id_pregunta=? LIMIT 1", (id_pregunta,))
+        preguntes = statscur.fetchall()
+
+        if len(preguntes) > 0:
+            if encertada:
+                statscur.execute("UPDATE stats_preguntes SET ok = ok + 1 WHERE id_pregunta=?",(id_pregunta,))
+            else:
+                statscur.execute("UPDATE stats_preguntes SET failed = failed + 1 WHERE id_pregunta=?",(id_pregunta,))
+        else:
+            if encertada:
+                statscur.execute("INSERT INTO stats_preguntes(id_pregunta,ok,failed) VALUES (?,1,0)",(id_pregunta,))
+            else:
+                statscur.execute("INSERT INTO stats_preguntes(id_pregunta,ok,failed) VALUES (?,0,1)",(id_pregunta,))
+        statsconn.commit()
 
     	bot.edit_message_text(text=emojize(response, use_aliases=True),
             	                chat_id=query.message.chat_id,
