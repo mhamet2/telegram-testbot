@@ -68,6 +68,7 @@ def stats(bot, update):
 
     statsdb = config.get('bot', 'statsfile')
     statsconn = create_connection(statsdb)
+    statsconn.row_factory = sqlite3.Row
     statscur = statsconn.cursor()
     statscur.execute("SELECT id,id_user,ok,failed FROM stats WHERE id_user=? LIMIT 1", (user_id,))
 
@@ -77,7 +78,8 @@ def stats(bot, update):
         update.message.reply_text(emojize("No hi ha dades"), use_aliases=True)
     else:
         for user in users:
-            update.message.reply_text(emojize(" :white_check_mark: "+str(user[2])+"\n :x: "+str(user[3]), use_aliases=True))
+            update.message.reply_text(emojize(" :white_check_mark: "+str(user['ok'])+"\n :x: "+str(user['failed']), use_aliases=True))
+    statsconn.close()
 
 def resetstats(bot, update):
     user_id = update.message.from_user.id
