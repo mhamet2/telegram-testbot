@@ -164,7 +164,7 @@ def pregunta(bot, update):
         update.message.reply_text(emojize("el criteri de busqueda no troba cap resultat", use_aliases=True))
 
 
-def button(bot, update):
+def preguntahandler(bot, update):
     query = update.callback_query
     user_id = query.from_user.id
     display_name = query.from_user.first_name
@@ -258,6 +258,18 @@ updater = Updater(token=BOT_TOKEN)
 
 dp = updater.dispatcher
 
+
+# conv_handler = ConversationHandler(
+#     entry_points={
+#         [CommandHandler('start', start)]
+#         },
+#     states={
+#         PREGUNTA: [CallbackQueryHandler(first)],
+#         SET_TEMA: [CallbackQueryHandler(second)]
+#     },
+#     fallbacks=[CommandHandler('start', start)]
+# )
+
 updater.dispatcher.add_handler(CommandHandler('start', start))
 updater.dispatcher.add_handler(CommandHandler('pregunta', pregunta))
 updater.dispatcher.add_handler(CommandHandler('stats', stats))
@@ -266,7 +278,7 @@ updater.dispatcher.add_handler(CommandHandler('ranking', ranking))
 updater.dispatcher.add_handler(CommandHandler('showversion', showversion))
 updater.dispatcher.add_handler(CommandHandler('kill', showpenis))
 updater.dispatcher.add_handler(CommandHandler('pegunta', showpenis))
-updater.dispatcher.add_handler(CallbackQueryHandler(button))
+updater.dispatcher.add_handler(CallbackQueryHandler(preguntahandler))
 
 updater.start_polling()
 
