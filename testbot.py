@@ -91,27 +91,66 @@ def start(bot, update):
     update.message.reply_text(emojize("fer servir la comanda /pregunta", use_aliases=True))
 
 def pregunta(bot, update):
+    user_id = update.message.from_user.id
+    display_name = query.from_user.first_name
+
     database = config.get('bot', 'dbfile')
     conn = create_connection(database)
     cur = conn.cursor()
-    cur.execute("SELECT id,pregunta,resposta_a,resposta_b,resposta_c,resposta_d,resposta_correcte FROM  preguntes ORDER BY RANDOM() LIMIT 1")
+
+    statsdb = config.get('bot', 'statsfile')
+    statsconn = create_connection(statsdb)
+    statscur = statsconn.cursor()
+    statscur.execute("SELECT id,id_user,ok,failed,display_name,offset_preguntes FROM stats WHERE id_user=? LIMIT 1", (user_id,))
+
+    users = statscur.fetchall()
+
+    # si no existeix, crear a 0
+    if len(users) == 0:
+      statscur = statsconn.cursor()
+      statscur.execute("INSERT INTO stats(id_user,ok,failed,display_name,offset_preguntes) VALUES (?,0,0,?,0)",(user_id,display_name,))
+      statsconn.commit()
+      statscur = statsconn.cursor()
+      statscur.execute("SELECT id,id_user,ok,failed,display_name,offset_preguntes FROM stats WHERE id_user=? LIMIT 1", (user_id,))
+      users = statscur.fetchall()
+
+    for user in users:
+        stats_display_name = user[4]
+        offset_preguntes = user[5]
+
+    cur.execute("SELECT id,pregunta,resposta_a,resposta_b,resposta_c,resposta_d,resposta_correcte FROM  preguntes LIMIT 1 OFFSET ?",(offset_preguntes,))
 
     rows = cur.fetchall()
 
+    if len(rows) > 0:
+        offset_preguntes+=1
+    else:
+        offset_preguntes=0
+        cur = conn.cursor()
+        cur.execute("SELECT id,pregunta,resposta_a,resposta_b,resposta_c,resposta_d,resposta_correcte FROM  preguntes LIMIT 1 OFFSET ?",(offset_preguntes,))
 
-    for row in rows:
-            for ext in [ 'jpg', 'png' ]:
-                if os.path.isfile('./img/'+str(row[0])+'.'+ext):
-                    #bot.send_photo(chat_id=chat_id, photo=open('tests/test.png', 'rb'))
-                    bot.send_photo(chat_id=update.message.chat_id, photo=open('./img/'+str(row[0])+'.'+ext, 'rb'))
+        rows = cur.fetchall()
 
-            keyboard = [[InlineKeyboardButton(row[2], callback_data='a')],
-                        [InlineKeyboardButton(row[3], callback_data='b')],
-                        [InlineKeyboardButton(row[4], callback_data='c')],
-                        [InlineKeyboardButton(row[5], callback_data='d')]]
+    statscur = statsconn.cursor()
+    statscur.execute("UPDATE stats SET offset_preguntes = ? WHERE id_user=?",(offset_preguntes, user_id,))
+    statsconn.commit()
 
-            reply_markup = InlineKeyboardMarkup(keyboard)
-            update.message.reply_text(row[1], reply_markup=reply_markup)
+    if len(rows) > 0:
+        for row in rows:
+                for ext in [ 'jpg', 'png' ]:
+                    if os.path.isfile('./img/'+str(row[0])+'.'+ext):
+                        #bot.send_photo(chat_id=chat_id, photo=open('tests/test.png', 'rb'))
+                        bot.send_photo(chat_id=update.message.chat_id, photo=open('./img/'+str(row[0])+'.'+ext, 'rb'))
+
+                keyboard = [[InlineKeyboardButton(row[2], callback_data='a')],
+                            [InlineKeyboardButton(row[3], callback_data='b')],
+                            [InlineKeyboardButton(row[4], callback_data='c')],
+                            [InlineKeyboardButton(row[5], callback_data='d')]]
+
+                reply_markup = InlineKeyboardMarkup(keyboard)
+                update.message.reply_text(row[1], reply_markup=reply_markup)
+    else:
+        update.message.reply_text(emojize("el criteri de busqueda no troba cap resultat", use_aliases=True))
 
 
 def button(bot, update):
