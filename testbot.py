@@ -35,7 +35,7 @@ def showversion(bot, update):
         update.message.reply_text(emojize("No hi ha dades"), use_aliases=True)
     else:
         for row in rows:
-            update.message.reply_text(emojize("Total: "+row[0]), use_aliases=True)
+            update.message.reply_text(emojize("Total: "+str(row[0])), use_aliases=True)
 
 def ranking(bot, update):
     chat_id = update.message.chat_id
