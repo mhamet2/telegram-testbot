@@ -92,7 +92,11 @@ def start(bot, update):
 
 def getWherePregunta(stats):
 
-    return ""
+    tema = stats[6]
+    examen = stats[7]
+    modalitat = stats[8]
+
+    return "WHERE modalitat=\""+modalitat+"\""
 
 def pregunta(bot, update):
     user_id = update.message.from_user.id
