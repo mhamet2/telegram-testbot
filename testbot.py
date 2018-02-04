@@ -92,7 +92,7 @@ def start(bot, update):
 
 def pregunta(bot, update):
     user_id = update.message.from_user.id
-    display_name = query.from_user.first_name
+    display_name = ''
 
     database = config.get('bot', 'dbfile')
     conn = create_connection(database)
