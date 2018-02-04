@@ -192,6 +192,7 @@ def preguntahandler(bot, update):
 
     database = config.get('bot', 'dbfile')
     conn = create_connection(database)
+    #conn.row_factory = sqlite3.Row
     cur = conn.cursor()
     cur.execute("SELECT id,pregunta,resposta_a,resposta_b,resposta_c,resposta_d,resposta_correcte FROM preguntes WHERE pregunta=? LIMIT 1", (query.message.text,))
 
