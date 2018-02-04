@@ -26,8 +26,9 @@ def showpenis(bot, update):
 def showversion(bot, update):
     database = config.get('bot', 'dbfile')
     conn = create_connection(database)
+    conn.row_factory = sqlite3.Row
     cur = conn.cursor()
-    cur.execute("SELECT count(*) FROM  preguntes")
+    cur.execute("SELECT count(*) AS count FROM  preguntes")
 
     rows = cur.fetchall()
 
@@ -35,7 +36,8 @@ def showversion(bot, update):
         update.message.reply_text(emojize("No hi ha dades"), use_aliases=True)
     else:
         for row in rows:
-            update.message.reply_text(emojize("Total: "+str(row[0])), use_aliases=True)
+            update.message.reply_text(emojize("Total: "+str(row['count'])), use_aliases=True)
+    conn.close()
 
 def ranking(bot, update):
     chat_id = update.message.chat_id
