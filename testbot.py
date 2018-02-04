@@ -110,10 +110,12 @@ def pregunta(bot, update):
 
     database = config.get('bot', 'dbfile')
     conn = create_connection(database)
+    conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
     statsdb = config.get('bot', 'statsfile')
     statsconn = create_connection(statsdb)
+    statsconn.row_factory = sqlite3.Row
     statscur = statsconn.cursor()
     statscur.execute("SELECT id,id_user,ok,failed,display_name,offset_preguntes,tema,examen,modalitat FROM stats WHERE id_user=? LIMIT 1", (user_id,))
 
@@ -129,8 +131,8 @@ def pregunta(bot, update):
       users = statscur.fetchall()
 
     for user in users:
-        stats_display_name = user[4]
-        offset_preguntes = user[5]
+        stats_display_name = user['display_name']
+        offset_preguntes = user['offset_preguntes']
         condicio_pregunta = getWherePregunta(user)
 
     sql_preguntes="SELECT id,pregunta,resposta_a,resposta_b,resposta_c,resposta_d,resposta_correcte FROM preguntes "+condicio_pregunta+" LIMIT 1 OFFSET ?"
@@ -155,19 +157,22 @@ def pregunta(bot, update):
     if len(rows) > 0:
         for row in rows:
                 for ext in [ 'jpg', 'png' ]:
-                    if os.path.isfile('./preguntes/'+str(row[0])+'.'+ext):
+                    if os.path.isfile('./preguntes/'+str(row['id'])+'.'+ext):
                         #bot.send_photo(chat_id=chat_id, photo=open('tests/test.png', 'rb'))
-                        bot.send_photo(chat_id=update.message.chat_id, photo=open('./img/'+str(row[0])+'.'+ext, 'rb'))
+                        bot.send_photo(chat_id=update.message.chat_id, photo=open('./preguntes/'+str(row['id'])+'.'+ext, 'rb'))
 
-                keyboard = [[InlineKeyboardButton(row[2], callback_data='a')],
-                            [InlineKeyboardButton(row[3], callback_data='b')],
-                            [InlineKeyboardButton(row[4], callback_data='c')],
-                            [InlineKeyboardButton(row[5], callback_data='d')]]
+                keyboard = [[InlineKeyboardButton(row['resposta_a'], callback_data='a')],
+                            [InlineKeyboardButton(row['resposta_b'], callback_data='b')],
+                            [InlineKeyboardButton(row['resposta_c'], callback_data='c')],
+                            [InlineKeyboardButton(row['resposta_d'], callback_data='d')]]
 
                 reply_markup = InlineKeyboardMarkup(keyboard)
-                update.message.reply_text(row[1], reply_markup=reply_markup)
+                update.message.reply_text(row['pregunta'], reply_markup=reply_markup)
     else:
         update.message.reply_text(emojize("el criteri de busqueda no troba cap resultat", use_aliases=True))
+
+    statsconn.close()
+    conn.close()
 
 
 def preguntahandler(bot, update):
