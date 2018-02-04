@@ -43,6 +43,7 @@ def ranking(bot, update):
 
     statsdb = config.get('bot', 'statsfile')
     statsconn = create_connection(statsdb)
+    statsconn.row_factory = sqlite3.Row
     statscur = statsconn.cursor()
     statscur.execute("SELECT id,id_user,ok,failed,display_name FROM stats ORDER BY ok DESC, failed ASC LIMIT 10")
 
@@ -54,9 +55,10 @@ def ranking(bot, update):
         ranking = []
         ranking.append("ranking:\n\n")
         for user in users:
-            if user[4] is not None:
-                ranking.append(''+user[4]+" :white_check_mark: "+str(user[2])+" :x: "+str(user[3])+"\n")
+            if user['display_name'] is not None:
+                ranking.append(''+user['display_name']+" :white_check_mark: "+str(user['ok'])+" :x: "+str(user['failed'])+"\n")
         update.message.reply_text(emojize(''.join(ranking), use_aliases=True))
+    statsconn.close()
 
 def stats(bot, update):
     chat_id = update.message.chat_id
