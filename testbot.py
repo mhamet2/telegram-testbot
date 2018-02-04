@@ -149,7 +149,7 @@ def pregunta(bot, update):
     if len(rows) > 0:
         for row in rows:
                 for ext in [ 'jpg', 'png' ]:
-                    if os.path.isfile('./img/'+str(row[0])+'.'+ext):
+                    if os.path.isfile('./preguntes/'+str(row[0])+'.'+ext):
                         #bot.send_photo(chat_id=chat_id, photo=open('tests/test.png', 'rb'))
                         bot.send_photo(chat_id=update.message.chat_id, photo=open('./img/'+str(row[0])+'.'+ext, 'rb'))
 
