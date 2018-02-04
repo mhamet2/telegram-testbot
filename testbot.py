@@ -184,6 +184,7 @@ def preguntahandler(bot, update):
 
     statsdb = config.get('bot', 'statsfile')
     statsconn = create_connection(statsdb)
+    statsconn.row_factory = sqlite3.Row
     statscur = statsconn.cursor()
     statscur.execute("SELECT id,id_user,ok,failed,display_name FROM stats WHERE id_user=? LIMIT 1", (user_id,))
 
@@ -199,10 +200,11 @@ def preguntahandler(bot, update):
       users = statscur.fetchall()
 
     for user in users:
-        stats_display_name = user[4]
+        stats_display_name = user['display_name']
 
     database = config.get('bot', 'dbfile')
     conn = create_connection(database)
+    # TODO: habilitar diccionari
     #conn.row_factory = sqlite3.Row
     cur = conn.cursor()
     cur.execute("SELECT id,pregunta,resposta_a,resposta_b,resposta_c,resposta_d,resposta_correcte FROM preguntes WHERE pregunta=? LIMIT 1", (query.message.text,))
@@ -215,6 +217,7 @@ def preguntahandler(bot, update):
         response=row[1]+"\n\n"
         id_pregunta=row[0]
     	encertada=True
+        # TODO: rescriure amb diccionari i canviant el callback_data a la pregunta en si
     	for i in range(2,6):
     		if len(row[i]) > 0:
     			lletra=chr(ord('a') + i-2)
