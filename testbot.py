@@ -90,6 +90,10 @@ def resetstats(bot, update):
 def start(bot, update):
     update.message.reply_text(emojize("fer servir la comanda /pregunta", use_aliases=True))
 
+def getWherePregunta(stats):
+
+    return ""
+
 def pregunta(bot, update):
     user_id = update.message.from_user.id
     display_name = ''
@@ -101,7 +105,7 @@ def pregunta(bot, update):
     statsdb = config.get('bot', 'statsfile')
     statsconn = create_connection(statsdb)
     statscur = statsconn.cursor()
-    statscur.execute("SELECT id,id_user,ok,failed,display_name,offset_preguntes FROM stats WHERE id_user=? LIMIT 1", (user_id,))
+    statscur.execute("SELECT id,id_user,ok,failed,display_name,offset_preguntes,tema,examen,modalitat FROM stats WHERE id_user=? LIMIT 1", (user_id,))
 
     users = statscur.fetchall()
 
@@ -111,14 +115,17 @@ def pregunta(bot, update):
       statscur.execute("INSERT INTO stats(id_user,ok,failed,display_name,offset_preguntes) VALUES (?,0,0,?,0)",(user_id,display_name,))
       statsconn.commit()
       statscur = statsconn.cursor()
-      statscur.execute("SELECT id,id_user,ok,failed,display_name,offset_preguntes FROM stats WHERE id_user=? LIMIT 1", (user_id,))
+      statscur.execute("SELECT id,id_user,ok,failed,display_name,offset_preguntes,tema,examen,modalitat FROM stats WHERE id_user=? LIMIT 1", (user_id,))
       users = statscur.fetchall()
 
     for user in users:
         stats_display_name = user[4]
         offset_preguntes = user[5]
+        condicio_pregunta = getWherePregunta(user)
 
-    cur.execute("SELECT id,pregunta,resposta_a,resposta_b,resposta_c,resposta_d,resposta_correcte FROM  preguntes LIMIT 1 OFFSET ?",(offset_preguntes,))
+    sql_preguntes="SELECT id,pregunta,resposta_a,resposta_b,resposta_c,resposta_d,resposta_correcte FROM preguntes "+condicio_pregunta+" LIMIT 1 OFFSET ?"
+
+    cur.execute(sql_preguntes,(offset_preguntes,))
 
     rows = cur.fetchall()
 
