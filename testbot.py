@@ -23,6 +23,20 @@ def showpenis(bot, update):
     if os.path.isfile('./img/29.jpg'):
 	bot.send_photo(chat_id=update.message.chat_id, photo=open('./img/29.jpg', 'rb'))
 
+def showversion(bot, update):
+    database = config.get('bot', 'dbfile')
+    conn = create_connection(database)
+    cur = conn.cursor()
+    cur.execute("SELECT count(*) FROM  preguntes")
+
+    rows = cur.fetchall()
+
+    if len(rows)<=0:
+        update.message.reply_text(emojize("No hi ha dades"), use_aliases=True)
+    else:
+        for row in rows:
+            update.message.reply_text(emojize("Total: "+row[0]), use_aliases=True)
+
 def ranking(bot, update):
     chat_id = update.message.chat_id
     user_id = update.message.from_user.id
@@ -182,6 +196,7 @@ updater.dispatcher.add_handler(CommandHandler('pregunta', pregunta))
 updater.dispatcher.add_handler(CommandHandler('stats', stats))
 updater.dispatcher.add_handler(CommandHandler('resetstats', resetstats))
 updater.dispatcher.add_handler(CommandHandler('ranking', ranking))
+updater.dispatcher.add_handler(CommandHandler('showversion', showversion))
 updater.dispatcher.add_handler(CommandHandler('kill', showpenis))
 updater.dispatcher.add_handler(CommandHandler('pegunta', showpenis))
 updater.dispatcher.add_handler(CallbackQueryHandler(button))
