@@ -114,7 +114,7 @@ def setTema(bot, update):
     temes = cur.fetchall()
 
     for tema in temes:
-        update.message.reply_text(emojize(tema, use_aliases=True))
+        update.message.reply_text(emojize(tema['tema'], use_aliases=True))
 
     conn.close()
 
