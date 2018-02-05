@@ -21,7 +21,7 @@ def create_connection(db_file):
 
 def showpenis(bot, update):
     if os.path.isfile('./pregunta/29.jpg'):
-	bot.send_photo(chat_id=update.message.chat_id, photo=open('./img/29.jpg', 'rb'))
+	bot.send_photo(chat_id=update.message.chat_id, photo=open('./pregunta/29.jpg', 'rb'))
 
 def showversion(bot, update):
     database = config.get('bot', 'dbfile')
