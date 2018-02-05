@@ -109,12 +109,20 @@ def setTema(bot, update):
     conn = create_connection(database)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
-    cur.execute("SELECT tema FROM preguntes WHERE tema is not NULL and tema != '' GROUP BY tema")
+    cur.execute("SELECT tema FROM preguntes WHERE tema is not NULL and tema != '' GROUP BY tema ORDER BY tema")
 
     temes = cur.fetchall()
 
+    count=0
+    keyboard_buttons=[]
     for tema in temes:
-        update.message.reply_text(emojize(tema['tema'], use_aliases=True))
+        keyboard_buttons.append([InlineKeyboardButton(tema, callback_data='t-'+str(count)+'-0')])
+        count=count+1
+        # update.message.reply_text(emojize(tema['tema'], use_aliases=True))
+
+    reply_markup = InlineKeyboardMarkup(keyboard_buttons)
+    update.message.reply_text('selecciona tema:', reply_markup=reply_markup)
+
 
     conn.close()
 
@@ -199,15 +207,17 @@ def pregunta(bot, update):
 
     if len(rows) > 0:
         for row in rows:
+    		statscur.execute("UPDATE stats SET ultima_pregunta_id = ? WHERE id_user=?",(row['id'], user_id,))
+    		statsconn.commit()
                 for ext in [ 'jpg', 'png' ]:
                     if os.path.isfile('./preguntes/'+str(row['id'])+'.'+ext):
                         #bot.send_photo(chat_id=chat_id, photo=open('tests/test.png', 'rb'))
                         bot.send_photo(chat_id=update.message.chat_id, photo=open('./preguntes/'+str(row['id'])+'.'+ext, 'rb'))
 
-                keyboard = [[InlineKeyboardButton(row['resposta_a'], callback_data='a')],
-                            [InlineKeyboardButton(row['resposta_b'], callback_data='b')],
-                            [InlineKeyboardButton(row['resposta_c'], callback_data='c')],
-                            [InlineKeyboardButton(row['resposta_d'], callback_data='d')]]
+                keyboard = [[InlineKeyboardButton(row['resposta_a'], callback_data='p-'+str(row['id'])+'-a')],
+                            [InlineKeyboardButton(row['resposta_b'], callback_data='p-'+str(row['id'])+'-b')],
+                            [InlineKeyboardButton(row['resposta_c'], callback_data='p-'+str(row['id'])+'-c')],
+                            [InlineKeyboardButton(row['resposta_d'], callback_data='p-'+str(row['id'])+'-d')]]
 
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 update.message.reply_text(row['pregunta'], reply_markup=reply_markup)
@@ -223,13 +233,24 @@ def preguntahandler(bot, update):
     user_id = query.from_user.id
     display_name = query.from_user.first_name
 
+    input_data=[]
+    input_data=query.data.split('-')
+
+    if len(input_data) != 3:
+      logging.debug('error input data')
+      return
+
+    tipus_input=input_data[0]
+    id_referencia=input_data[1]
+    resultat_referencia=input_data[2]
+
     # print query
 
     statsdb = config.get('bot', 'statsfile')
     statsconn = create_connection(statsdb)
     statsconn.row_factory = sqlite3.Row
     statscur = statsconn.cursor()
-    statscur.execute("SELECT id,id_user,ok,failed,display_name FROM stats WHERE id_user=? LIMIT 1", (user_id,))
+    statscur.execute("SELECT id,id_user,ok,failed,display_name,ultima_pregunta_id FROM stats WHERE id_user=? LIMIT 1", (user_id,))
 
     users = statscur.fetchall()
 
@@ -250,11 +271,11 @@ def preguntahandler(bot, update):
     # TODO: habilitar diccionari
     #conn.row_factory = sqlite3.Row
     cur = conn.cursor()
-    cur.execute("SELECT id,pregunta,resposta_a,resposta_b,resposta_c,resposta_d,resposta_correcte FROM preguntes WHERE pregunta=? LIMIT 1", (query.message.text,))
+    cur.execute("SELECT id,pregunta,resposta_a,resposta_b,resposta_c,resposta_d,resposta_correcte FROM preguntes WHERE id=? LIMIT 1", (id_referencia,))
 
     rows = cur.fetchall()
 
-    #print query
+    logging.debug('preguntes coincidents: '+str(len(rows)))
 
     for row in rows:
         response=row[1]+"\n\n"
@@ -267,7 +288,7 @@ def preguntahandler(bot, update):
     			if lletra == row[6]:
     				response+=lletra+") "+row[i]+"  :white_check_mark:\n"
     			else:
-    				if lletra == query.data:
+    				if lletra == resultat_referencia:
     					response+=lletra+") "+row[i]+" :x:\n"
     					encertada=False
     				else:
