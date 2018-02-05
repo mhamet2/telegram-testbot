@@ -104,6 +104,20 @@ def getWherePregunta(stats):
 
     return "WHERE modalitat=\""+modalitat+"\""
 
+def setTema(bot, update):
+    database = config.get('bot', 'dbfile')
+    conn = create_connection(database)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    cur.execute("SELECT tema FROM preguntes WHERE tema is not NULL and tema != '' GROUP BY tema")
+
+    temes = cur.fetchall()
+
+    update.message.reply_text(emojize(''.join(temes), use_aliases=True))
+
+    conn.close()
+
+
 def pregunta(bot, update):
     user_id = update.message.from_user.id
     display_name = ''
@@ -291,6 +305,7 @@ updater.dispatcher.add_handler(CommandHandler('stats', stats))
 updater.dispatcher.add_handler(CommandHandler('resetstats', resetstats))
 updater.dispatcher.add_handler(CommandHandler('ranking', ranking))
 updater.dispatcher.add_handler(CommandHandler('showversion', showversion))
+updater.dispatcher.add_handler(CommandHandler('settema', setTema))
 updater.dispatcher.add_handler(CommandHandler('kill', showpenis))
 updater.dispatcher.add_handler(CommandHandler('pegunta', showpenis))
 updater.dispatcher.add_handler(CallbackQueryHandler(preguntahandler))
