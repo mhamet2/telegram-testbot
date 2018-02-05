@@ -118,6 +118,34 @@ def setTema(bot, update):
 
     conn.close()
 
+def setModalitat(bot, update):
+    database = config.get('bot', 'dbfile')
+    conn = create_connection(database)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    cur.execute("SELECT modalitat FROM preguntes WHERE modalitat is not NULL and modalitat != '' GROUP BY modalitat")
+
+    temes = cur.fetchall()
+
+    for tema in temes:
+        update.message.reply_text(emojize(tema['modalitat'], use_aliases=True))
+
+    conn.close()
+
+def setExamen(bot, update):
+    database = config.get('bot', 'dbfile')
+    conn = create_connection(database)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    cur.execute("SELECT examen FROM preguntes WHERE examen is not NULL and examen != '' GROUP BY examen")
+
+    temes = cur.fetchall()
+
+    for tema in temes:
+        update.message.reply_text(emojize(tema['examen'], use_aliases=True))
+
+    conn.close()
+
 
 def pregunta(bot, update):
     user_id = update.message.from_user.id
@@ -307,6 +335,8 @@ updater.dispatcher.add_handler(CommandHandler('resetstats', resetstats))
 updater.dispatcher.add_handler(CommandHandler('ranking', ranking))
 updater.dispatcher.add_handler(CommandHandler('showversion', showversion))
 updater.dispatcher.add_handler(CommandHandler('settema', setTema))
+updater.dispatcher.add_handler(CommandHandler('setmodalitat', setModalitat))
+updater.dispatcher.add_handler(CommandHandler('setexamen', setExamen))
 updater.dispatcher.add_handler(CommandHandler('kill', showpenis))
 updater.dispatcher.add_handler(CommandHandler('pegunta', showpenis))
 updater.dispatcher.add_handler(CallbackQueryHandler(preguntahandler))
