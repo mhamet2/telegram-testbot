@@ -114,8 +114,8 @@ def getWherePregunta(stats):
         condicions.append("examen=\""+examen+"\"")
 
     if len(condicions) > 0:
-        condicions.insert(0,"WHERE")
-        return ' '.join(condicions)
+        retstr=' AND '.join(condicions)
+        return "WHERE "+retstr
     else:
         return ""
 
@@ -202,10 +202,12 @@ def pregunta(bot, update):
       statscur.execute("SELECT id,id_user,ok,failed,display_name,offset_preguntes,tema,examen,modalitat FROM stats WHERE id_user=? LIMIT 1", (user_id,))
       users = statscur.fetchall()
 
-    for user in users:
-        stats_display_name = user['display_name']
-        offset_preguntes = user['offset_preguntes']
-        condicio_pregunta = getWherePregunta(user)
+    user=users[0]
+    stats_display_name = user['display_name']
+    offset_preguntes = user['offset_preguntes']
+    condicio_pregunta = getWherePregunta(user)
+
+    logging.debug("CONDICIO: "+condicio_pregunta)
 
     sql_preguntes="SELECT id,pregunta,resposta_a,resposta_b,resposta_c,resposta_d,resposta_correcte FROM preguntes "+condicio_pregunta+" LIMIT 1 OFFSET ?"
 
@@ -249,8 +251,7 @@ def pregunta(bot, update):
     conn.close()
 
 def resettema(bot, update):
-    query = update.callback_query
-    user_id = query.from_user.id
+    user_id = update.message.from_user.id 
 
     statsdb = config.get('bot', 'statsfile')
     statsconn = create_connection(statsdb)
