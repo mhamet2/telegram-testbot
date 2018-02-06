@@ -302,7 +302,7 @@ def preguntahandler(bot, update):
     	else:
     		statscur.execute("UPDATE stats SET failed = failed + 1 WHERE id_user=?",(user_id,))
 
-        if stats_display_name!=display_name:
+        if (stats_display_name is None or stats_display_name!=display_name):
     	       statscur.execute("UPDATE stats SET display_name = ? WHERE id_user=?",(display_name, user_id,))
     	statsconn.commit()
 
