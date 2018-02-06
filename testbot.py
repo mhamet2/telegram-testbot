@@ -157,7 +157,10 @@ def setExamen(bot, update):
 
 def pregunta(bot, update):
     user_id = update.message.from_user.id
-    display_name = update.message.from_user.first_name+" "+update.message.from_user.last_name
+    display_name = update.message.from_user.first_name
+
+    if update.message.from_user.last_name is not None:
+        display_name+=" "+update.message.from_user.last_name
 
     logging.debug("USUARI DISPLAY: "+display_name)
 
@@ -233,8 +236,13 @@ def pregunta(bot, update):
 def preguntahandler(bot, update):
     query = update.callback_query
     user_id = query.from_user.id
-    display_name = update.message.from_user.first_name+" "+update.message.from_user.last_name
-    #display_name = query.from_user.first_name
+    #logging.debug("Cognom DISPLAY: "+update.message.from_user.last_name)
+    #display_name = update.message.from_user.first_name+" "+update.message.from_user.last_name
+    display_name = query.from_user.first_name
+
+    if query.from_user.last_name is not None:
+        display_name+=" "+query.from_user.last_name
+
 
     logging.debug("USUARI DISPLAY: "+display_name)
 
