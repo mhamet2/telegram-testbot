@@ -98,11 +98,26 @@ def start(bot, update):
 
 def getWherePregunta(stats):
 
-    tema = stats[6]
-    examen = stats[7]
-    modalitat = stats[8]
+    tema = stats['tema']
+    examen = stats['examen']
+    modalitat = stats['modalitat']
 
-    return "WHERE modalitat=\""+modalitat+"\""
+    condicions = []
+
+    if modalitat is not None and len(modalitat) > 0:
+        condicions.append("modalitat=\""+modalitat+"\"")
+
+    if tema is not None and len(tema) > 0:
+        condicions.append("tema=\""+tema+"\"")
+
+    if examen is not None and len(examen) > 0:
+        condicions.append("examen=\""+examen+"\"")
+
+    if len(condicions) > 0:
+        condicions.insert(0,"WHERE")
+        return ' '.join(condicions)
+    else:
+        return ""
 
 def setTema(bot, update):
     database = config.get('bot', 'dbfile')
@@ -232,6 +247,19 @@ def pregunta(bot, update):
 
     statsconn.close()
     conn.close()
+
+def resettema(bot, update):
+    query = update.callback_query
+    user_id = query.from_user.id
+
+    statsdb = config.get('bot', 'statsfile')
+    statsconn = create_connection(statsdb)
+    statscur = statsconn.cursor()
+    statscur.execute("UPDATE stats SET tema = '' WHERE id_user = ?", (user_id,))
+    statsconn.commit()
+
+    update.message.reply_text(emojize("tema resetejat", use_aliases=True))
+
 
 def updateTema(bot, update):
     query = update.callback_query
@@ -446,6 +474,7 @@ updater.dispatcher.add_handler(CommandHandler('resetstats', resetstats))
 updater.dispatcher.add_handler(CommandHandler('ranking', ranking))
 updater.dispatcher.add_handler(CommandHandler('showversion', showversion))
 updater.dispatcher.add_handler(CommandHandler('settema', setTema))
+updater.dispatcher.add_handler(CommandHandler('resettema', resettema))
 updater.dispatcher.add_handler(CommandHandler('setmodalitat', setModalitat))
 updater.dispatcher.add_handler(CommandHandler('setexamen', setExamen))
 updater.dispatcher.add_handler(CommandHandler('kill', showpenis))
