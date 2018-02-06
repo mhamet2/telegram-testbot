@@ -264,8 +264,8 @@ def preguntahandler(bot, update):
       statscur.execute("SELECT id,id_user,ok,failed,display_name FROM stats WHERE id_user=? LIMIT 1", (user_id,))
       users = statscur.fetchall()
 
-    for user in users:
-        stats_display_name = user['display_name']
+    user=users[0]
+    stats_display_name = user['display_name']
 
     database = config.get('bot', 'dbfile')
     conn = create_connection(database)
