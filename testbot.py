@@ -245,6 +245,7 @@ def preguntahandler(bot, update):
     resultat_referencia=input_data[2]
 
     # print query
+    logging.debug(query)
 
     statsdb = config.get('bot', 'statsfile')
     statsconn = create_connection(statsdb)
