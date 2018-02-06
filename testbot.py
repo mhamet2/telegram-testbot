@@ -57,7 +57,7 @@ def ranking(bot, update):
         ranking = []
         ranking.append("ranking:\n\n")
         for user in users:
-            if (user['display_name'] is not None and len(user['display_name']) > 0):
+            if (user['display_name'] is not None and len(user['display_name']) > 0 and user['ok']+user['failed'] > 0):
                 ranking.append(''+user['display_name']+" :white_check_mark: "+str(user['ok'])+" :x: "+str(user['failed'])+"\n")
         update.message.reply_text(emojize(''.join(ranking), use_aliases=True))
     statsconn.close()
