@@ -157,7 +157,9 @@ def setExamen(bot, update):
 
 def pregunta(bot, update):
     user_id = update.message.from_user.id
-    display_name = ''
+    display_name = update.message.from_user.first_name+" "+update.message.from_user.last_name
+
+    logging.debug("USUARI DISPLAY: "+display_name)
 
     database = config.get('bot', 'dbfile')
     conn = create_connection(database)
@@ -231,7 +233,10 @@ def pregunta(bot, update):
 def preguntahandler(bot, update):
     query = update.callback_query
     user_id = query.from_user.id
-    display_name = query.from_user.first_name
+    display_name = update.message.from_user.first_name+" "+update.message.from_user.last_name
+    #display_name = query.from_user.first_name
+
+    logging.debug("USUARI DISPLAY: "+display_name)
 
     input_data=[]
     input_data=query.data.split('-')
