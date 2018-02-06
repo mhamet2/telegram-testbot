@@ -243,7 +243,6 @@ def preguntahandler(bot, update):
     if query.from_user.last_name is not None:
         display_name+=" "+query.from_user.last_name
 
-
     logging.debug("USUARI DISPLAY: "+display_name)
 
     input_data=[]
