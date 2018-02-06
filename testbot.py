@@ -116,9 +116,10 @@ def setTema(bot, update):
     count=0
     keyboard_buttons=[]
     for tema in temes:
-        keyboard_buttons.append([InlineKeyboardButton(tema, callback_data='t-'+str(count)+'-0')])
+        keyboard_buttons.append([InlineKeyboardButton(tema['tema'], callback_data='t-'+str(count)+'-0')])
         count=count+1
-        # update.message.reply_text(emojize(tema['tema'], use_aliases=True))
+
+    logging.debug(str(keyboard_buttons))
 
     reply_markup = InlineKeyboardMarkup(keyboard_buttons)
     update.message.reply_text('selecciona tema:', reply_markup=reply_markup)
@@ -232,8 +233,7 @@ def pregunta(bot, update):
     statsconn.close()
     conn.close()
 
-
-def preguntahandler(bot, update):
+def updateTema(bot, update):
     query = update.callback_query
     user_id = query.from_user.id
     #logging.debug("Cognom DISPLAY: "+update.message.from_user.last_name)
@@ -256,8 +256,51 @@ def preguntahandler(bot, update):
     id_referencia=input_data[1]
     resultat_referencia=input_data[2]
 
-    # print query
-    logging.debug(query)
+    database = config.get('bot', 'dbfile')
+    conn = create_connection(database)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    cur.execute("SELECT tema FROM preguntes WHERE tema is not NULL and tema != '' GROUP BY tema ORDER BY tema LIMIT 1 OFFSET ?",(id_referencia,))
+
+    temes = cur.fetchall()
+    tema = temes[0]
+
+    statsdb = config.get('bot', 'statsfile')
+    statsconn = create_connection(statsdb)
+    statsconn.row_factory = sqlite3.Row
+    statscur = statsconn.cursor()
+    statscur.execute("UPDATE stats SET tema = ? WHERE id_user = ?", (tema['tema'], user_id,))
+    statsconn.commit()
+
+    bot.edit_message_text(text=emojize("tema: "+tema['tema'], use_aliases=True), chat_id=query.message.chat_id, message_id=query.message.message_id)
+
+    statsconn.close()
+    conn.close()
+
+
+
+def tipuspregunta(bot, update):
+    query = update.callback_query
+    user_id = query.from_user.id
+    #logging.debug("Cognom DISPLAY: "+update.message.from_user.last_name)
+    #display_name = update.message.from_user.first_name+" "+update.message.from_user.last_name
+    display_name = query.from_user.first_name
+
+    if query.from_user.last_name is not None:
+        display_name+=" "+query.from_user.last_name
+
+    logging.debug("USUARI DISPLAY: "+display_name)
+
+    input_data=[]
+    input_data=query.data.split('-')
+
+    if len(input_data) != 3:
+      logging.debug('error input data')
+      return
+
+    tipus_input=input_data[0]
+    id_referencia=input_data[1]
+    resultat_referencia=input_data[2]
 
     statsdb = config.get('bot', 'statsfile')
     statsconn = create_connection(statsdb)
@@ -337,6 +380,40 @@ def preguntahandler(bot, update):
     	bot.edit_message_text(text=emojize(response, use_aliases=True),
             	                chat_id=query.message.chat_id,
     	                        message_id=query.message.message_id)
+
+
+def preguntahandler(bot, update):
+    query = update.callback_query
+    user_id = query.from_user.id
+    #logging.debug("Cognom DISPLAY: "+update.message.from_user.last_name)
+    #display_name = update.message.from_user.first_name+" "+update.message.from_user.last_name
+    display_name = query.from_user.first_name
+
+    if query.from_user.last_name is not None:
+        display_name+=" "+query.from_user.last_name
+
+    logging.debug("USUARI DISPLAY: "+display_name)
+
+    input_data=[]
+    input_data=query.data.split('-')
+
+    if len(input_data) != 3:
+      logging.debug('error input data')
+      return
+
+    tipus_input=input_data[0]
+    id_referencia=input_data[1]
+    resultat_referencia=input_data[2]
+
+    # print query
+    logging.debug(query)
+
+    if tipus_input == 'p':
+      tipuspregunta(bot, update)
+    elif tipus_input == 't':
+      updateTema(bot, update)
+    else:
+      logging.debug("TIPUS NO SOPORTAT: "+tipus_input+" FULL STRING: "+input_data)
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
