@@ -96,6 +96,9 @@ def resetstats(bot, update):
 def start(bot, update):
     update.message.reply_text(emojize("fer servir la comanda /pregunta", use_aliases=True))
 
+def getsource(bot, update):
+    update.message.reply_text(emojize("https://github.com/jordiprats/telegram-testbot", use_aliases=True))
+
 def getWherePregunta(stats):
 
     tema = stats['tema']
@@ -251,7 +254,7 @@ def pregunta(bot, update):
     conn.close()
 
 def resettema(bot, update):
-    user_id = update.message.from_user.id 
+    user_id = update.message.from_user.id
 
     statsdb = config.get('bot', 'statsfile')
     statsconn = create_connection(statsdb)
@@ -476,6 +479,7 @@ updater.dispatcher.add_handler(CommandHandler('ranking', ranking))
 updater.dispatcher.add_handler(CommandHandler('showversion', showversion))
 updater.dispatcher.add_handler(CommandHandler('settema', setTema))
 updater.dispatcher.add_handler(CommandHandler('resettema', resettema))
+updater.dispatcher.add_handler(CommandHandler('getsource', getsource))
 updater.dispatcher.add_handler(CommandHandler('setmodalitat', setModalitat))
 updater.dispatcher.add_handler(CommandHandler('setexamen', setExamen))
 updater.dispatcher.add_handler(CommandHandler('kill', showpenis))
