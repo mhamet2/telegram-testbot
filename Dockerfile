@@ -6,6 +6,9 @@ RUN yum install epel-release -y
 RUN yum install git -y
 RUN yum install curl -y
 RUN yum install python-setuptools.noarch -y
+RUN yum install python-pip -y
+
+RUN pip install tabulate
 
 RUN mkdir -p /usr/local/src/testbot
 
