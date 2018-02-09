@@ -246,19 +246,19 @@ def showTemari(bot, update):
     conn.close()
 
 
-def setExamen(bot, update):
-    database = config.get('bot', 'dbfile')
-    conn = create_connection(database)
-    conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
-    cur.execute("SELECT examen FROM preguntes WHERE examen is not NULL and examen != '' GROUP BY examen")
-
-    temes = cur.fetchall()
-
-    for tema in temes:
-        update.message.reply_text(emojize(tema['examen'], use_aliases=True))
-
-    conn.close()
+# def setExamen(bot, update):
+#     database = config.get('bot', 'dbfile')
+#     conn = create_connection(database)
+#     conn.row_factory = sqlite3.Row
+#     cur = conn.cursor()
+#     cur.execute("SELECT examen FROM preguntes WHERE examen is not NULL and examen != '' GROUP BY examen")
+#
+#     temes = cur.fetchall()
+#
+#     for tema in temes:
+#         update.message.reply_text(emojize(tema['examen'], use_aliases=True))
+#
+#     conn.close()
 
 
 def pregunta(bot, update):
