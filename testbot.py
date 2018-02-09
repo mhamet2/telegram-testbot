@@ -186,7 +186,7 @@ def setExamen(bot, update):
     logging.debug(str(keyboard_buttons))
 
     reply_markup = InlineKeyboardMarkup(keyboard_buttons)
-    update.message.reply_text('selecciona tema:', reply_markup=reply_markup)
+    update.message.reply_text('selecciona examen:', reply_markup=reply_markup)
     conn.close()
 
 def setTema(bot, update):
