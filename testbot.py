@@ -403,6 +403,7 @@ def updateExamen(bot, update):
     statsconn.row_factory = sqlite3.Row
     statscur = statsconn.cursor()
     statscur.execute("UPDATE stats SET examen = ? WHERE id_user = ?", (examen['examen'], user_id,))
+    statscur.execute("UPDATE stats SET tema = '' WHERE id_user = ?", (user_id,))
     statsconn.commit()
 
     bot.edit_message_text(text=emojize("examen: "+examen['examen'], use_aliases=True), chat_id=query.message.chat_id, message_id=query.message.message_id)
@@ -447,6 +448,7 @@ def updateTema(bot, update):
     statsconn.row_factory = sqlite3.Row
     statscur = statsconn.cursor()
     statscur.execute("UPDATE stats SET tema = ? WHERE id_user = ?", (tema['tema'], user_id,))
+    statscur.execute("UPDATE stats SET examen = '' WHERE id_user = ?", (user_id,))
     statsconn.commit()
 
     bot.edit_message_text(text=emojize("tema: "+tema['tema'], use_aliases=True), chat_id=query.message.chat_id, message_id=query.message.message_id)
