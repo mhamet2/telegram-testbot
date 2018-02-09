@@ -168,6 +168,27 @@ def getWherePregunta(stats):
     else:
         return ""
 
+def setExamen(bot, update):
+    database = config.get('bot', 'dbfile')
+    conn = create_connection(database)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    cur.execute("SELECT examen FROM preguntes WHERE examen is not NULL and examen != '' GROUP BY examen ORDER BY examen")
+
+    examens = cur.fetchall()
+
+    count=0
+    keyboard_buttons=[]
+    for examen in examens:
+        keyboard_buttons.append([InlineKeyboardButton(examen['examen'], callback_data='e-'+str(count)+'-0')])
+        count=count+1
+
+    logging.debug(str(keyboard_buttons))
+
+    reply_markup = InlineKeyboardMarkup(keyboard_buttons)
+    update.message.reply_text('selecciona tema:', reply_markup=reply_markup)
+    conn.close()
+
 def setTema(bot, update):
     database = config.get('bot', 'dbfile')
     conn = create_connection(database)
@@ -184,11 +205,8 @@ def setTema(bot, update):
         count=count+1
 
     logging.debug(str(keyboard_buttons))
-
     reply_markup = InlineKeyboardMarkup(keyboard_buttons)
     update.message.reply_text('selecciona tema:', reply_markup=reply_markup)
-
-
     conn.close()
 
 def setModalitat(bot, update):
@@ -325,6 +343,17 @@ def pregunta(bot, update):
     statsconn.close()
     conn.close()
 
+def resetexamen(bot, update):
+    user_id = update.message.from_user.id
+
+    statsdb = config.get('bot', 'statsfile')
+    statsconn = create_connection(statsdb)
+    statscur = statsconn.cursor()
+    statscur.execute("UPDATE stats SET examen = '' WHERE id_user = ?", (user_id,))
+    statsconn.commit()
+
+    update.message.reply_text(emojize("examen resetejat", use_aliases=True))
+
 def resettema(bot, update):
     user_id = update.message.from_user.id
 
@@ -336,6 +365,50 @@ def resettema(bot, update):
 
     update.message.reply_text(emojize("tema resetejat", use_aliases=True))
 
+
+def updateExamen(bot, update):
+    query = update.callback_query
+    user_id = query.from_user.id
+    #logging.debug("Cognom DISPLAY: "+update.message.from_user.last_name)
+    #display_name = update.message.from_user.first_name+" "+update.message.from_user.last_name
+    display_name = query.from_user.first_name
+
+    if query.from_user.last_name is not None:
+        display_name+=" "+query.from_user.last_name
+
+    logging.debug("USUARI DISPLAY: "+display_name)
+
+    input_data=[]
+    input_data=query.data.split('-')
+
+    if len(input_data) != 3:
+      logging.debug('error input data')
+      return
+
+    tipus_input=input_data[0]
+    id_referencia=input_data[1]
+    resultat_referencia=input_data[2]
+
+    database = config.get('bot', 'dbfile')
+    conn = create_connection(database)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    cur.execute("SELECT examen FROM preguntes WHERE examen is not NULL and examen != '' GROUP BY examen ORDER BY examen LIMIT 1 OFFSET ?",(id_referencia,))
+
+    examens = cur.fetchall()
+    examen = examens[0]
+
+    statsdb = config.get('bot', 'statsfile')
+    statsconn = create_connection(statsdb)
+    statsconn.row_factory = sqlite3.Row
+    statscur = statsconn.cursor()
+    statscur.execute("UPDATE stats SET examen = ? WHERE id_user = ?", (examen['examen'], user_id,))
+    statsconn.commit()
+
+    bot.edit_message_text(text=emojize("examen: "+examen['examen'], use_aliases=True), chat_id=query.message.chat_id, message_id=query.message.message_id)
+
+    statsconn.close()
+    conn.close()
 
 def updateTema(bot, update):
     query = update.callback_query
@@ -492,7 +565,7 @@ def displayTema(bot, update):
     #logging.debug("Cognom DISPLAY: "+update.message.from_user.last_name)
     #display_name = update.message.from_user.first_name+" "+update.message.from_user.last_name
     display_name = query.from_user.first_name
-    
+
     logging.debug(query)
 
     if query.from_user.last_name is not None:
@@ -520,7 +593,7 @@ def displayTema(bot, update):
     temari = cur.fetchall()
 
     tema = temari[int(id_referencia)]
-    
+
     if tema is not None:
       bot.edit_message_text(text=emojize(tema['nom'], use_aliases=True), chat_id=query.message.chat_id, message_id=query.message.message_id)
       files = getfileid(tema['id'], 'temari')
@@ -528,7 +601,7 @@ def displayTema(bot, update):
         for file in files:
           logging.debug(file)
           bot.send_photo(chat_id=chat_id, photo=open(file, 'rb'))
- 
+
 
     conn.close()
 
@@ -562,6 +635,8 @@ def preguntahandler(bot, update):
       tipuspregunta(bot, update)
     elif tipus_input == 't':
       updateTema(bot, update)
+    elif tipus_input == 'e':
+      updateExamen(bot, update)
     elif tipus_input == 'tt':
       displayTema(bot, update)
     else:
@@ -586,7 +661,9 @@ updater.dispatcher.add_handler(CommandHandler('resetstats', resetstats))
 updater.dispatcher.add_handler(CommandHandler('ranking', ranking))
 updater.dispatcher.add_handler(CommandHandler('showversion', showversion))
 updater.dispatcher.add_handler(CommandHandler('settema', setTema))
+updater.dispatcher.add_handler(CommandHandler('setexamen', setExamen))
 updater.dispatcher.add_handler(CommandHandler('resettema', resettema))
+updater.dispatcher.add_handler(CommandHandler('resetexamen', resetexamen))
 updater.dispatcher.add_handler(CommandHandler('getsource', getsource))
 updater.dispatcher.add_handler(CommandHandler('setmodalitat', setModalitat))
 updater.dispatcher.add_handler(CommandHandler('setexamen', setExamen))
