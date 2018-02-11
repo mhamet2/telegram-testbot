@@ -561,7 +561,7 @@ def tipuspregunta(bot, update):
             	                chat_id=query.message.chat_id,
     	                        message_id=query.message.message_id)
 
-def displayTema(bot, update):
+def displayTemari(bot, update):
     query = update.callback_query
     user_id = query.from_user.id
     chat_id = update.callback_query.message.chat_id
@@ -641,7 +641,7 @@ def preguntahandler(bot, update):
     elif tipus_input == 'e':
       updateExamen(bot, update)
     elif tipus_input == 'tt':
-      displayTema(bot, update)
+      displayTemari(bot, update)
     else:
       logging.debug("TIPUS NO SOPORTAT: "+tipus_input+" FULL STRING: "+input_data)
 
