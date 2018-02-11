@@ -229,7 +229,7 @@ def showTemari(bot, update):
     conn = create_connection(database)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
-    cur.execute("SELECT id,nom,text FROM temari ORDER BY id")
+    cur.execute("SELECT id,nom,text FROM temari ORDER BY ordre")
 
     temari = cur.fetchall()
 
@@ -591,7 +591,7 @@ def displayTema(bot, update):
     conn = create_connection(database)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
-    cur.execute("SELECT id,nom,text FROM temari ORDER BY id")
+    cur.execute("SELECT id,nom,text FROM temari ORDER BY ordre")
 
     temari = cur.fetchall()
 
