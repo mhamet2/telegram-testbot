@@ -85,9 +85,8 @@ def ranking(bot, update):
         for user in users:
             if (user['display_name'] is not None and len(user['display_name']) > 0 and user['ok']+user['failed'] > 0):
                 #ranking.append(''+user['display_name']+" :white_check_mark: "+str(user['ok'])+" :x: "+str(user['failed'])+" :arrows_clockwise: "+"{:.2f}".format(float(user['ok']-user['failed'])/float(user['ok']+user['failed']) )+"\n")
-                rati = "{:.2f}".format(float(user['ok']-user['failed'])/float(user['ok']+user['failed']))
-                if rati > 0:
-	              ranking.append([ user['display_name'], emojize(":white_check_mark:", use_aliases=True), str(user['ok']), emojize(":x:", use_aliases=True), str(user['failed']), emojize(":arrows_clockwise:", use_aliases=True), rati ])
+                if float(user['ok']-user['failed'])/float(user['ok']+user['failed'] > 0.0:
+		          ranking.append([ user['display_name'], emojize(":white_check_mark:", use_aliases=True), str(user['ok']), emojize(":x:", use_aliases=True), str(user['failed']), emojize(":arrows_clockwise:", use_aliases=True), "{:.2f}".format(float(user['ok']-user['failed'])/float(user['ok']+user['failed'])) ])
         update.message.reply_text("ranking:\n<pre>\n"+tabulate(ranking, tablefmt="plain")+"\n</pre>",parse_mode=telegram.ParseMode.HTML)
     statsconn.close()
 
