@@ -313,7 +313,7 @@ def pregunta(bot, update):
     else:
         offset_preguntes=0
         cur = conn.cursor()
-        cur.execute("SELECT id,pregunta,resposta_a,resposta_b,resposta_c,resposta_d,resposta_correcte FROM  preguntes LIMIT 1 OFFSET ?",(offset_preguntes,))
+        cur.execute("SELECT id,pregunta,resposta_a,resposta_b,resposta_c,resposta_d,resposta_correcte FROM  preguntes "+condicio_pregunta+" LIMIT 1 OFFSET ?",(offset_preguntes,))
 
         rows = cur.fetchall()
 
