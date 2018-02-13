@@ -38,6 +38,13 @@ def getfileid(id, tipus='preguntes'):
       logging.debug('retornant primer nivell')
       return files
 
+def sendFile(bot, chat_id, file):
+    if file.find(".mp4") != -1:
+      logging.debug('fent servir send_document')
+      bot.send_document(chat_id=chat_id, document=open(file, 'rb'), timeout=20)
+    else:
+      bot.send_photo(chat_id=chat_id, photo=open(file, 'rb'))
+
 def showpenis(bot, update):
     user_id = update.message.from_user.id
 
@@ -46,7 +53,8 @@ def showpenis(bot, update):
       files = getfileid('encantat', 'fites')
       if len(files) > 0:
         for file in files:
-          bot.send_photo(chat_id=update.message.chat_id, photo=open(file, 'rb'))
+          # bot.send_photo(chat_id=update.message.chat_id, photo=open(file, 'rb'))
+          sendFile(bot, update.message.chat_id, file)
     else:
       logging.debug("not a troll: "+str(user_id)+"//"+'%'.join(config.get('bot', 'trolls').split(",")))
 
@@ -603,7 +611,8 @@ def displayTemari(bot, update):
       if len(files) > 0:
         for file in files:
           logging.debug(file)
-          bot.send_photo(chat_id=chat_id, photo=open(file, 'rb'))
+          # bot.send_photo(chat_id=chat_id, photo=open(file, 'rb'))
+          sendFile(bot, chat_id, file)
 
 
     conn.close()
