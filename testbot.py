@@ -599,7 +599,8 @@ def displayTemari(bot, update):
 
     if tema is not None:
       bot.edit_message_text(text=emojize(tema['nom'], use_aliases=True), chat_id=query.message.chat_id, message_id=query.message.message_id)
-      update.message.reply_text(emojize(tema[text]), use_aliases=True)
+      if tema[text] is not None:
+          bot.send_message(chat_id=chat_id, text=emojize(tema['text'], use_aliases=True))
       files = getfileid(tema['id'], 'temari')
       if len(files) > 0:
         for file in files:
