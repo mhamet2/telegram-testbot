@@ -618,7 +618,7 @@ def displayTemari(bot, update):
     conn.close()
 
 def preguntahandler(bot, update):
-    bot.send_chat_action(chat_id=update.callback_query.message.chat_id, action=telegram.ChatAction.TYPING)
+    # bot.send_chat_action(chat_id=update.callback_query.message.chat_id, action=telegram.ChatAction.TYPING)
     query = update.callback_query
     user_id = query.from_user.id
     #logging.debug("Cognom DISPLAY: "+update.message.from_user.last_name)
