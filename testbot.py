@@ -40,6 +40,8 @@ def getfileid(id, tipus='preguntes'):
 
 def showpenis(bot, update):
     user_id = update.message.from_user.id
+    chat_id = update.message.chat_id
+    bot.send_chat_action(chat_id=chat_id, action=telegram.ChatAction.TYPING)
 
     if str(user_id) in config.get('bot', 'trolls').split(","):
       logging.debug("TROLL DETECTED: "+str(user_id)+" - show penis")
@@ -48,6 +50,7 @@ def showpenis(bot, update):
         for file in files:
           bot.send_photo(chat_id=update.message.chat_id, photo=open(file, 'rb'))
     else:
+      bot.send_message(chat_id=chat_id, text=emojize(':underage:', use_aliases=True))
       logging.debug("not a troll: "+str(user_id)+"//"+'%'.join(config.get('bot', 'trolls').split(",")))
 
 def showversion(bot, update):
@@ -69,6 +72,7 @@ def showversion(bot, update):
 def ranking(bot, update):
     chat_id = update.message.chat_id
     user_id = update.message.from_user.id
+    bot.send_chat_action(chat_id=chat_id, action=telegram.ChatAction.TYPING)
 
     statsdb = config.get('bot', 'statsfile')
     statsconn = create_connection(statsdb)
@@ -112,6 +116,7 @@ def getquestionid(bot, update):
 def stats(bot, update):
     chat_id = update.message.chat_id
     user_id = update.message.from_user.id
+    bot.send_chat_action(chat_id=chat_id, action=telegram.ChatAction.TYPING)
 
     statsdb = config.get('bot', 'statsfile')
     statsconn = create_connection(statsdb)
@@ -265,6 +270,8 @@ def showTemari(bot, update):
 def pregunta(bot, update):
     user_id = update.message.from_user.id
     display_name = update.message.from_user.first_name
+    chat_id = update.message.chat_id
+    bot.send_chat_action(chat_id=chat_id, action=telegram.ChatAction.TYPING)
 
     if display_name is None:
       display_name=''
