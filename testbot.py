@@ -229,7 +229,7 @@ def showTemari(bot, update):
     conn = create_connection(database)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
-    cur.execute("SELECT id,nom,text FROM temari ORDER BY ordre")
+    cur.execute("SELECT id,nom,dades FROM temari ORDER BY ordre")
 
     temari = cur.fetchall()
 
@@ -591,7 +591,7 @@ def displayTemari(bot, update):
     conn = create_connection(database)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
-    cur.execute("SELECT id,nom,text FROM temari ORDER BY ordre")
+    cur.execute("SELECT id,nom,dades FROM temari ORDER BY ordre")
 
     temari = cur.fetchall()
 
@@ -599,8 +599,8 @@ def displayTemari(bot, update):
 
     if tema is not None:
       bot.edit_message_text(text=emojize(tema['nom'], use_aliases=True), chat_id=query.message.chat_id, message_id=query.message.message_id)
-      if tema[text] is not None:
-          bot.send_message(chat_id=chat_id, text=emojize(tema['text'], use_aliases=True))
+      if tema['dades'] is not None:
+          bot.send_message(chat_id=chat_id, text=emojize(tema['dades'], use_aliases=True))
       files = getfileid(tema['id'], 'temari')
       if len(files) > 0:
         for file in files:
