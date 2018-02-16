@@ -1,0 +1,11 @@
+version: "2.1"
+services:
+  testbot:
+    image: eyp/pertesterbot
+    build: .
+    restart: always
+    volumes:
+      - testbot-data:/opt/telegram/testbot/datadir
+
+volumes:
+  testbot-data:
