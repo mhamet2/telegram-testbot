@@ -3,6 +3,7 @@ import os.path
 import logging
 import glob
 import telegram
+import sys
 
 from tabulate import tabulate
 from sqlite3 import Error
@@ -15,7 +16,7 @@ from emoji import emojize
 
 def create_connection(db_file):
     try:
-        conn = sqlite3.connect(db_file)
+        conn = sqlite3.connect(basedir+'/'+db_file)
         return conn
     except Error as e:
         print(e)
@@ -29,11 +30,11 @@ def getfileid(id, tipus='preguntes'):
     else:
       fid = str(id)
 
-    files = glob.glob("./"+tipus+"/"+fid+".*")
+    files = glob.glob(basedir + "/"+tipus+"/"+fid+".*")
 
     if len(files) <= 0:
       logging.debug('primer nivell no trobat, tornant segon')
-      return glob.glob("./"+tipus+"/"+fid+"/*")
+      return glob.glob(basedir + "/"+tipus+"/"+fid+"/*")
     else:
       logging.debug('retornant primer nivell')
       return files
@@ -99,7 +100,7 @@ def ranking(bot, update):
             if (user['display_name'] is not None and len(user['display_name']) > 0 and user['ok']+user['failed'] > 0):
                 #ranking.append(''+user['display_name']+" :white_check_mark: "+str(user['ok'])+" :x: "+str(user['failed'])+" :arrows_clockwise: "+"{:.2f}".format(float(user['ok']-user['failed'])/float(user['ok']+user['failed']) )+"\n")
                 if float(user['ok']-user['failed'])/float(user['ok']+user['failed']) > 0.0:
-		          ranking.append([ user['display_name'], emojize(":white_check_mark:", use_aliases=True), str(user['ok']), emojize(":x:", use_aliases=True), str(user['failed']), emojize(":arrows_clockwise:", use_aliases=True), "{:.2f}".format(float(user['ok']-user['failed'])/float(user['ok']+user['failed'])) ])
+		          ranking.append([ user['display_name'], emojize(":white_check_mark:", use_aliases=True), str(user['ok']), emojize(":x:", use_aliases=True), str(user['failed']), emojize(":arrows_clockwise:", use_aliases=True), "{:.3f}".format(float(user['ok']-user['failed'])/float(user['ok']+user['failed'])) ])
         update.message.reply_text("ranking:\n<pre>\n"+tabulate(ranking, tablefmt="plain")+"\n</pre>",parse_mode=telegram.ParseMode.HTML)
     statsconn.close()
 
@@ -343,10 +344,10 @@ def pregunta(bot, update):
     		statscur.execute("UPDATE stats SET ultima_pregunta_id = ? WHERE id_user=?",(row['id'], user_id,))
     		statsconn.commit()
                 for ext in [ 'jpg', 'png' ]:
-                    if os.path.isfile('./preguntes/'+str(row['id'])+'.'+ext):
+                    if os.path.isfile(basedir+'/preguntes/'+str(row['id'])+'.'+ext):
                         #bot.send_photo(chat_id=chat_id, photo=open('tests/test.png', 'rb'))
                         # bot.send_photo(chat_id=update.message.chat_id, photo=open('./preguntes/'+str(row['id'])+'.'+ext, 'rb'))
-                        sendFile(bot, update.message.chat_id, './preguntes/'+str(row['id'])+'.'+ext)
+                        sendFile(bot, update.message.chat_id, basedir+'/preguntes/'+str(row['id'])+'.'+ext)
 
                 keyboard = [[InlineKeyboardButton(row['resposta_a'], callback_data='p-'+str(row['id'])+'-a')],
                             [InlineKeyboardButton(row['resposta_b'], callback_data='p-'+str(row['id'])+'-b')],
@@ -469,7 +470,7 @@ def updateTema(bot, update):
     statscur.execute("UPDATE stats SET examen = '' WHERE id_user = ?", (user_id,))
     statsconn.commit()
 
-    bot.edit_message_text(text=emojize("tema: "+tema['tema'], use_aliases=True), chat_id=query.message.chat_id, message_id=query.message.message_id)
+    bot.edit_message_text(text=emojize("tema:\n"+tema['tema']+" :white_check_mark:", use_aliases=True), chat_id=query.message.chat_id, message_id=query.message.message_id)
 
     statsconn.close()
     conn.close()
@@ -669,8 +670,13 @@ def preguntahandler(bot, update):
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
+try:
+    basedir = sys.argv[1]
+except IndexError:
+    basedir = '.'
+
 config = SafeConfigParser()
-config.read('testbot.config')
+config.read(basedir+'/testbot.config')
 
 BOT_TOKEN = config.get('bot', 'token')
 
