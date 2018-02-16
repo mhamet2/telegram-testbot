@@ -1,7 +1,9 @@
 *~
 *swp
 *.config
-apunts/*
 fites/*
 preguntes/*
 temari/*
+per.sqlite
+perstats.sqlite
+teoria.sqlite
