@@ -6,6 +6,9 @@ RUN yum install epel-release -y
 RUN yum install git -y
 RUN yum install curl -y
 RUN yum install python-setuptools.noarch -y
+RUN yum install python-pip -y
+
+RUN pip install tabulate
 
 RUN mkdir -p /usr/local/src/testbot
 
@@ -17,7 +20,16 @@ RUN mkdir -p /usr/local/src/emoji
 RUN git clone https://github.com/carpedm20/emoji.git /usr/local/src/emoji
 RUN bash -c 'cd /usr/local/src/emoji; python setup.py install'
 
-RUN mkdir -p /opt/telegram/testbot
+RUN mkdir -p /opt/telegram/testbot/datadir
 
 COPY testbot.py /opt/telegram/testbot/testbot.py
-COPY testbot.config /opt/telegram/testbot/testbot.config
+
+COPY testbot.config /opt/telegram/testbot/datadir/testbot.config
+COPY temari /opt/telegram/testbot/datadir/temari
+COPY preguntes /opt/telegram/testbot/datadir/preguntes
+COPY fites /opt/telegram/testbot/datadir/fites
+COPY *.sqlite /opt/telegram/testbot/datadir/
+
+VOLUME ["/opt/telegram/testbot/datadir"]
+
+CMD [ "/usr/bin/python", "/opt/telegram/testbot/testbot.py", "/opt/telegram/testbot/datadir" ]
